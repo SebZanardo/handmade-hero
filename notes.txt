@@ -1,0 +1,274 @@
+This document contains notes from Handmade Hero series that I felt were
+important to write down.
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO DAY 001 ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+If you're not on Linux you have to find a C compiler.
+
+No way on Windows that works on the command line and works in standard
+application mode (there are work arounds). This is not the case on Unix
+operating systems.
+
+There are a number of ways to build a C program, for example building for 32bit
+or 64bit. Or maybe if you have different versions of the application such as
+Debug and Retail mode. These would be part of the configuration before
+compilation stage
+
+Compilation is a translation process, from human read to something CPU can read
+
+Computers can have multiple processors, but the CPU itself is divided into
+multiple cores. Cores allow processors to execute multiple things at a time.
+Cores can nowadays store multiple states, even though it can only run once
+process at a time it can switch between multiple states, hyperthread
+
+When you build something the computer can try to multithread the process
+Microsoft resource compiler puts resources such as images in a place where
+executable can find it
+
+Linking is the process of gathering all the intermediate files, linking them
+together. Intermediate files are a mostly legacy idea that exists to save on
+compilation in larger programs where files that haven't changed don't need to
+be recompiled, just linked to
+
+How does Windows know where to link to your program? Windows is a program too,
+BIOS links to windows, etc... There is a specific function signature that the
+platforms C compiler specifies as an entry point to the program for the OS
+
+Hungarian notation says you should prefix everything you type into a computer.
+pFoo (pointer to foo), mFoo (member variable), hFoo (OS handle). Casey doesn't
+like this standard
+
+Why is identifier not found for function not a linking error and a compilation
+error? In C but more in C++ you must define things before they can be called. C
+allows for forward declaration with a function prototype or declaration. If you
+only have declaration is becomes a link error as there is no definition
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO Q&A DAY 001 ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+ASCII --> Unicode
+Support foreign languages that cannot be represented in an 8bit character set
+Unicode uses 16bit encoding per character
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO DAY 002 ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+ASCII is a way that people mapped numbers to characters. Computers work with
+binary that are in essence numbers
+
+Breakpoint is running program to a specific point in execution and freezing the
+state of the computer for inspection
+
+\n and other escape codes are a way of typing the invisible ASCII character
+mapped to 10, etc
+
+\r\n is how you newline on Windows, go back to first character and then newline
+Linux is just \n
+
+When allocating variable onto the stack it not initialised
+
+char is 8bits = 256 different values (not 0-255) [-128,127]
+char unsigned is [0,255]
+short 16 bits 65536
+int 32 bits 4,294,967,296
+
+When you add to a number in C when it is at its highest possible value it wraps
+instead of using saturation arithmetic
+
+When you run code it loads it into memory so every line of assembly has a
+location in memory during execution
+
+Register is often size of operating system 64bit, 32bit. When performing
+operations on values that is done in registers, so wrapping for 8bit variable
+wouldn't occur on 64bit system until the value was moved from the register back
+to the place in memory where the variable is stored
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO Q&A DAY 002 ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+C tries to solve the /r/n difference problem with Windows and Unix
+
+unsigned can go before or after type unsigned int == int unsigned
+
+Casey hates the C++ standard library, should build your own
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO DAY 003 ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+All programming is about modifying memory. Different parts of the computer
+communicate through values in memory
+
+A C pointer doesn't point to physical memory necessarily, instead it points to
+virtual memory. Kernel defines pages in physical memory for each process.
+Translation look aside buffer, memory tables
+
+Can poke and change any virtual memory that has been allocated to the process,
+get error if we try to access and modify memory outside allocated block
+
+Address space layout randomisation is used to reduce effectiveness of hackers
+
+Each page is marked with a flag with access controls as read, write or
+executable
+
+BUS transfers bits from RAM sticks to CPU using memory controller. This is a
+long way to go
+
+Gigahertz of a CPU is the speed of a single tick of its internal clock. The CPU
+can't do anything faster than a clock tick. Hence once of the reasons why CPU
+cache is so much faster than reaching into main memory as it is a physically
+shorter distance
+
+Latency and Throughput. Latency is how long to start and finish something. But
+since you can send multiple things out at once, throughput is how much can you
+get back in a period of time (bandwidth).
+
+CPU dye is coloured diagram
+
+L1 cache, L2 cache, L3 cache. L1 cache is closest and fastest. If not in any of
+the caches then need to go to main memory. Performance algorithms can be used
+to determine how often you are using different parts of memory
+
+L1 cache and L2 cache are in CPU core, L3 cache is shared between cores
+
+There is also harddrive which is used to load values into main memory
+
+When executing game code want to basically never have to go back into harddrive
+memory during runtime, at worst going to main memory is slow enough
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO Q&A DAY 003 ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+If you miss a cache and fail out to main memory could mean 200 or 400
+additional instructions. Performance nowadays is about managing the cache
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO DAY 004 ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Some computer architectures have fixed length instructions whilst others like
+Intel have variable length, based on the instruction it will know how many
+bytes to read
+
+C is storing data type of variable somewhere in memory
+
+Little endian is smaller part of binary coming first, big endian is opposite.
+This is ordering is used when a value is bigger than one byte needs to be
+stored in memory.
+
+unsigned short val;
+val = 500;
+
+2152 1631 8421
+0015 2426
+4226 8
+84
+0001 1111 0100
+
+val would be stored in memory as (little endian)
+244 1
+
+Compiler is smart and can choose not to pack a struct as it is faster to access
+data in certain intervals
+
+Hexadecimal is nice because it lines up with binary
+
+Before running program Windows may load 0xcc (204 in decimal) into memory. This
+is for security and so that you as the programmer can more easily catch when
+the program is trying to use uninitialised memory, instead of loading a value
+like 0 which is used everywhere
+
+Pointer is size of OS, 32bit system is 32bits per pointer
+
+C actually adds size of type to addition of structs. S + 30 == S + 30*sizeof(S)
+
+There are things you can write above struct definitions to stop the compiler
+from trying to optimise and force it to pack.
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO Q&A DAY 004 ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Negative numbers are encoded using twos complement
+
+Class and struct are not necessarily layed out differently in memory, only when
+you start to add virtual functions which would require a VTABLE pointer
+
+Structs should be ordered largest to smallest data types with data type of same
+size next to each other. If you are really trying to optimise it turn of
+compiler packing and do it yourself
+
+Little endian vs Big endian. Little endian is standard now and is harder to
+read, but better for casting pointer data types to other types
+
+Standard C datatype sizes can change between platforms, so a good idea to
+define your own
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO DAY 005 ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Code lives in the executable file in a format defined by Intel and AMD
+
+Exe is split into separate parts, header, tables, code
+
+In the virtual address under the block of memory when running the exe system
+code will be loaded into this space
+
+Some parts of code will only be loaded into memory if they are going to be
+reached during executition
+
+VirtualMemoryAddressSpace is split up into pages which are 4096 or 64k bytes
+
+There is a table in the OS that records what is going on with the VMAS
+
+Each page in the VMAS has flags whether read, write, exec can be done currently
+
+Will get a page fault if you try to read, write or run a page after freed
+
+Each Virtual page is stored in physical memory or on disk, Virtual page address
+can be in harddisk memory
+
+Program will only be compatible with architecture it was compiled for
+
+Icache, on the CPU, is used to load instructions into CPU for faster execution
+
+A guard page is setup after stack page to allow for growth and to protect the
+memory for the rest of the program.
+
+Bitwise not is ~
+
+////////////////////////////////////////////////////////////////////////////////
+// INTRO Q&A DAY 005 ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Bitfields allow you to define structs with each member of size less than a byte
+Casey doesn't like as the compiler decides stuff, he would rather do it himself
+by hand
+
+The stack doesn't live on the cache, it lives in memory (virtual memory space)
+since the CPU uses the stack all the time it is usually hot in the stack, at
+least to top of the stack is
+
+The Icache is for code not data
+
+RAII is bad (slower performance, more dev time)
+
+Casey never types the word class
+
+Polymorphism is bad
+
+Full mix-in is more powerful than inheritance
+
+Handmade hero is in cpp for operator overloading, function overloading, Casey's
+coding style is pretty much C and doesn't use a lot of C++ features cause
+they are bad
+
+Shortcircuitting, is where code will not continue computing logical statement
+if it cannot change. e.g int z = (x = x + 3) || (y = y + 3);
