@@ -272,3 +272,105 @@ they are bad
 
 Shortcircuitting, is where code will not continue computing logical statement
 if it cannot change. e.g int z = (x = x + 3) || (y = y + 3);
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 001 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 002 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 003 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+OS will deallocate after program exits. Don't do manually because then program
+will hang whilst it deallocated when you try and close it.
+
+Three different things static keyword does
+interal --> functions, only used in this script
+local_persist --> variable holds value after it would normally go off stack
+global_variable --> variable can be used in this script anywhere
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 004 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Can rename types using typedef to suit your naming style
+typedef u_int8_t uint8;
+
+Group data in structs, to make returning from functions easy. But write
+functions that allow for arguments to be passed individually as that is the
+most flexible.
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 005 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Don't worry about creating variables outside of loops as compiler optimises
+anyways. Instead do whatever is more clear. When calling a function it makes
+space for all local variables to the function.
+
+Passing a struct by pointer is usually better to modify inplace rather than
+having to create a copy, but note that this means the compiler can't precompute
+it's value.
+
+Stack will be allocated at random place in memory when program starts for
+security.
+
+Can ask compiler to allow for larger initial stack.
+
+Casey doesn't use const. You can change the value of a const. Const doesn't
+actually exist in the optimiser.
+
+////////////////////////////////////////////////////////////////////////////////
+// DAY 006 /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Small APIs are great.
+
+When using an API, rather than requiring all the dependencies, it is possible
+to try and link yourself and load the dependencies that you want to link to
+into memory. This should be done with the assumption that it might fail, so
+using stubs incase the mapping fails is a good idea so the game doesn't crash
+if it fails.
+
+
+Casey likes to do it like this:
+	1. MACRO to define the function prototype with any name
+	2. typedef using the MACRO to alias name of linked function
+	3. Then use the MACRO again to define a stub function under different name
+	4. Then a static (global_variable) defining the typedef as pointer to the stub
+	5. Then #define to replace linked name with defined name
+	6. Then load the library (.dll) into memory and if found link
+
+Example:
+	#define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex, XINPUT_STATE *pState)
+	typedef X_INPUT_GET_STATE(x_input_get_state);
+	X_INPUT_GET_STATE(XInputGetStateStub) { return 0; }
+	global_variable x_input_get_state *XInputGetState_ = XInputGetStateStub;
+	#define XInputGetState XInputGetState_
+
+	// Loading the .dll and trying to point functions to the stub
+	internal void Win32LoadXInput(void) {
+		HMODULE XInputLibrary = LoadLibraryA("xinput1_3.dll");
+		if (XInputLibrary) {
+			XInputGetState = (x_input_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
+		}
+	}
+
+Casey says don't try and do lower level optimisation until wayyyyy later in
+development. Nice and clean and simple code is better. Trying to do low level
+optimisations early on are a complete waste of time, you might be making it
+worse, you aren't going to spend time to test it, if you want to change it
+later it is much harder if you have make the code harder to understand by
+trying to **optimise** the lower level stuff.
+
+NOTE: You can also include the dependencies. This can be a great idea sometimes
+but for common dependencies like XInput this is not needed. The user can always
+install the dependency if they are missing it, rather than including it and
+increasing filesize and possibly creating a copy of it.
+
+You cannot link manual dependencies at compile time, dependencies should be
+done at runtime.
