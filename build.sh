@@ -28,15 +28,15 @@ if [ -z $1 ]; then
 
 elif [ $1 = $LINUX ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux
-    cc src/main.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -Wall -o game.exe
+    cc src/main.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -Wall -o game
 
 elif [ $1 = $MACOS ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-macOS
-    eval cc src/main.c -framework IOKit -framework Cocoa -framework OpenGL $(pkg-config --libs --cflags raylib) -Wall -o game.exe
+    eval cc src/main.c -framework IOKit -framework Cocoa -framework OpenGL $(pkg-config --libs --cflags raylib) -Wall -o game
 
 elif [ $1 = $WINDOWS ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-Windows
-    gcc src/main.c -lraylib -lgdi32 -lwinmm -Wall -o game.exe
+    gcc src/main.c -lraylib -lgdi32 -lwinmm -Wall -o game
 
 elif [ $1 = $WEB ]; then
     if [ -z "$EMSDK" ]; then
@@ -53,12 +53,12 @@ elif [ $1 = $WEB ]; then
         -s USE_GLFW=3 \
         -s ASYNCIFY \
         --shell-file $HOME/raylib/src/minshell.html \
-        --preload-file src/resources \
+        --preload-file src/data \
         -s TOTAL_STACK=64MB \
         -s INITIAL_MEMORY=128MB \
         -DPLATFORM_WEB
 
-    # Replace body tag with body tag that includes centring
+    # Replace body tag with with a centred one
     sed -i 's|<body>|<body style="margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background-color:black;">|' web/index.html
 
 else
@@ -76,5 +76,5 @@ if [ $1 = $WEB ]; then
     emrun web/index.html
 else
     # Run the executable that was created
-    ./game.exe
+    ./game
 fi
